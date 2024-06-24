@@ -2,17 +2,23 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\AtDateTrait;
-use App\Repository\FileRepository;
+use App\Repository\FolderRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-#[ORM\Entity(repositoryClass: FileRepository::class)]
-class File
+#[ORM\Entity(repositoryClass: FolderRepository::class)]
+#[Vich\Uploadable]
+class Folder
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[Vich\UploadableField(mapping: 'folders', fileNameProperty: 'name')]
+    private ?File $folderFile = null;
+    //TODO: finish vich
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
@@ -20,10 +26,8 @@ class File
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-    #[ORM\ManyToOne(inversedBy: 'files')]
-    private ?Task $taskId = null;
-
-    use AtDateTrait;
+    #[ORM\ManyToOne(inversedBy: 'folders')]
+    private ?Task $task = null;
 
     public function getId(): ?int
     {
@@ -54,14 +58,14 @@ class File
         return $this;
     }
 
-    public function getTaskId(): ?Task
+    public function getTask(): ?Task
     {
-        return $this->taskId;
+        return $this->task;
     }
 
-    public function setTaskId(?Task $taskId): static
+    public function setTask(?Task $task): static
     {
-        $this->taskId = $taskId;
+        $this->task = $task;
 
         return $this;
     }

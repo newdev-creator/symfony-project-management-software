@@ -56,17 +56,17 @@ class Task
     private Collection $subTasks;
 
     /**
-     * @var Collection<int, File>
+     * @var Collection<int, Folder>
      */
-    #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'taskId')]
-    private Collection $files;
+    #[ORM\OneToMany(targetEntity: Folder::class, mappedBy: 'task')]
+    private Collection $folders;
 
     public function __construct()
     {
         $this->assignedUserId = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->subTasks = new ArrayCollection();
-        $this->files = new ArrayCollection();
+        $this->folders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -234,29 +234,29 @@ class Task
     }
 
     /**
-     * @return Collection<int, File>
+     * @return Collection<int, Folder>
      */
-    public function getFiles(): Collection
+    public function getFolders(): Collection
     {
-        return $this->files;
+        return $this->folders;
     }
 
-    public function addFile(File $file): static
+    public function addFolder(Folder $folder): static
     {
-        if (!$this->files->contains($file)) {
-            $this->files->add($file);
-            $file->setTaskId($this);
+        if (!$this->folders->contains($folder)) {
+            $this->folders->add($folder);
+            $folder->setTask($this);
         }
 
         return $this;
     }
 
-    public function removeFile(File $file): static
+    public function removeFolder(Folder $folder): static
     {
-        if ($this->files->removeElement($file)) {
+        if ($this->folders->removeElement($folder)) {
             // set the owning side to null (unless already changed)
-            if ($file->getTaskId() === $this) {
-                $file->setTaskId(null);
+            if ($folder->getTask() === $this) {
+                $folder->setTask(null);
             }
         }
 
