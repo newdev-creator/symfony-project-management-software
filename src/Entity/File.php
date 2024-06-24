@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\AtDateTrait;
 use App\Repository\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,6 +19,11 @@ class File
 
     #[ORM\Column(length: 255)]
     private ?string $path = null;
+
+    #[ORM\ManyToOne(inversedBy: 'files')]
+    private ?Task $taskId = null;
+
+    use AtDateTrait;
 
     public function getId(): ?int
     {
@@ -44,6 +50,18 @@ class File
     public function setPath(string $path): static
     {
         $this->path = $path;
+
+        return $this;
+    }
+
+    public function getTaskId(): ?Task
+    {
+        return $this->taskId;
+    }
+
+    public function setTaskId(?Task $taskId): static
+    {
+        $this->taskId = $taskId;
 
         return $this;
     }

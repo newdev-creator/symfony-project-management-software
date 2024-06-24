@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\AtDateTrait;
 use App\Repository\TaskRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,6 +31,43 @@ class Task
 
     #[ORM\Column(length: 255)]
     private ?string $status = null;
+
+    use AtDateTrait;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'tasks')]
+    private Collection $assignedUserId;
+
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    private ?Project $projectId = null;
+
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'taskId')]
+    private Collection $comments;
+
+    /**
+     * @var Collection<int, SubTask>
+     */
+    #[ORM\OneToMany(targetEntity: SubTask::class, mappedBy: 'taskId')]
+    private Collection $subTasks;
+
+    /**
+     * @var Collection<int, File>
+     */
+    #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'taskId')]
+    private Collection $files;
+
+    public function __construct()
+    {
+        $this->assignedUserId = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->subTasks = new ArrayCollection();
+        $this->files = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +130,135 @@ class Task
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getAssignedUserId(): Collection
+    {
+        return $this->assignedUserId;
+    }
+
+    public function addAssignedUserId(User $assignedUserId): static
+    {
+        if (!$this->assignedUserId->contains($assignedUserId)) {
+            $this->assignedUserId->add($assignedUserId);
+            $assignedUserId->addTask($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedUserId(User $assignedUserId): static
+    {
+        if ($this->assignedUserId->removeElement($assignedUserId)) {
+            $assignedUserId->removeTask($this);
+        }
+
+        return $this;
+    }
+
+    public function getProjectId(): ?Project
+    {
+        return $this->projectId;
+    }
+
+    public function setProjectId(?Project $projectId): static
+    {
+        $this->projectId = $projectId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setTaskId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getTaskId() === $this) {
+                $comment->setTaskId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SubTask>
+     */
+    public function getSubTasks(): Collection
+    {
+        return $this->subTasks;
+    }
+
+    public function addSubTask(SubTask $subTask): static
+    {
+        if (!$this->subTasks->contains($subTask)) {
+            $this->subTasks->add($subTask);
+            $subTask->setTaskId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubTask(SubTask $subTask): static
+    {
+        if ($this->subTasks->removeElement($subTask)) {
+            // set the owning side to null (unless already changed)
+            if ($subTask->getTaskId() === $this) {
+                $subTask->setTaskId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(File $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+            $file->setTaskId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(File $file): static
+    {
+        if ($this->files->removeElement($file)) {
+            // set the owning side to null (unless already changed)
+            if ($file->getTaskId() === $this) {
+                $file->setTaskId(null);
+            }
+        }
 
         return $this;
     }

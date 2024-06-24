@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\AtDateTrait;
 use App\Repository\SubTaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,6 +20,11 @@ class SubTask
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'subTasks')]
+    private ?Task $taskId = null;
+
+    use AtDateTrait;
 
     public function getId(): ?int
     {
@@ -45,6 +51,18 @@ class SubTask
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getTaskId(): ?Task
+    {
+        return $this->taskId;
+    }
+
+    public function setTaskId(?Task $taskId): static
+    {
+        $this->taskId = $taskId;
 
         return $this;
     }

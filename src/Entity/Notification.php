@@ -3,12 +3,12 @@
 namespace App\Entity;
 
 use App\Entity\Trait\AtDateTrait;
-use App\Repository\CommentRepository;
+use App\Repository\NotificationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CommentRepository::class)]
-class Comment
+#[ORM\Entity(repositoryClass: NotificationRepository::class)]
+class Notification
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,11 +24,8 @@ class Comment
     #[ORM\Column]
     private ?bool $isRead = null;
 
-    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\ManyToOne(inversedBy: 'notifications')]
     private ?User $userId = null;
-
-    #[ORM\ManyToOne(inversedBy: 'comments')]
-    private ?Task $taskId = null;
 
     use AtDateTrait;
 
@@ -81,18 +78,6 @@ class Comment
     public function setUserId(?User $userId): static
     {
         $this->userId = $userId;
-
-        return $this;
-    }
-
-    public function getTaskId(): ?Task
-    {
-        return $this->taskId;
-    }
-
-    public function setTaskId(?Task $taskId): static
-    {
-        $this->taskId = $taskId;
 
         return $this;
     }
